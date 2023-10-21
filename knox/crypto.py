@@ -2,6 +2,7 @@ import binascii
 from os import urandom as generate_bytes
 
 from knox.settings import knox_settings
+from cryptography.hazmat.primitives.hashes import Hash
 
 hash_func = knox_settings.SECURE_HASH_ALGORITHM
 
@@ -26,6 +27,6 @@ def hash_token(token: str) -> str:
     Token must contain an even number of hex digits or
     a binascii.Error exception will be raised.
     """
-    digest = hash_func()
-    digest.update(make_hex_compatible(token))
-    return digest.hexdigest()
+    digest = Hash(hash_func())
+    digest.update(bytes(token, "utf-8"))
+    return digest.finalize().hex()
